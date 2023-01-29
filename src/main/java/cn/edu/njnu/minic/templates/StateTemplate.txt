@@ -1,0 +1,16 @@
+    ${state_name} {
+        @Override
+        public State next(char word) {
+            switch (word) {
+${case_slot}
+                default: return Fail;
+            }
+        }
+
+        @Override
+        public Object execute(String _content) throws Exception {
+            Object _return = null;
+            ${execute_slot}
+            return _return;
+        }
+    }

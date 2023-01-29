@@ -1,0 +1,3 @@
+                case '${case_name}': {
+                    return ${next_state_name};
+                }

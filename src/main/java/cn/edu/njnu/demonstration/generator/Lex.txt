@@ -1,0 +1,248 @@
+# Spaces
+[\s]*
+%%[return new Word(TypeEnum.Space, _content);%%]
+
+# Integer
+[\d][\d]*
+%%[
+try {
+    return new Word(TypeEnum.Int, Integer.parseInt(_content));
+} catch (NumberFormatException e) {
+    // Nope, simply in case the Double type and Integer type share the same ending
+}
+%%]
+
+# Double x.x
+[\d][\d]*.[\d][\d]*
+%%[return new Word(TypeEnum.Double, Double.parseDouble(_content));%%]
+
+# Double xex
+[\d][\d]*(e|E)(((+|-)[\d])|[\d])[\d]*
+%%[return new Word(TypeEnum.Double, Double.parseDouble(_content));%%]
+
+# Double x.xex
+[\d][\d]*.[\d][\d]*(e|E)(((+|-)[\d])|[\d])[\d]*
+%%[return new Word(TypeEnum.Double, Double.parseDouble(_content));%%]
+
+# Identifier or reserved words
+(_|[\w])(_|[\w]|[\d])*
+%%[
+return IdentifierClassifier.classify(_content);
+%%]
+
+# Operators should judge before return, in case an ending state linked to multiple operators
++
+%%[
+if (_content.equals("+"))
+    return new Word(OperatorEnum.Plus, _content);
+%%]
+
+++
+%%[
+if (_content.equals("++"))
+    return new Word(OperatorEnum.PlusPlus, _content);
+%%]
+
+-
+%%[
+if (_content.equals("-"))
+    return new Word(OperatorEnum.Minus, _content);
+%%]
+
+--
+%%[
+if (_content.equals("--"))
+    return new Word(OperatorEnum.MinusMinus, _content);
+%%]
+
+;
+%%[
+if (_content.equals(";"))
+    return new Word(OperatorEnum.Semicolon, _content);
+%%]
+
+=
+%%[
+if (_content.equals("="))
+    return new Word(OperatorEnum.Equal, _content);
+%%]
+
+==
+%%[
+if (_content.equals("=="))
+    return new Word(OperatorEnum.EqualEqual, _content);
+%%]
+
+\*
+%%[
+if (_content.equals("*"))
+    return new Word(OperatorEnum.Multiply, _content);
+%%]
+
+/
+%%[
+if (_content.equals("/"))
+    return new Word(OperatorEnum.Divide, _content);
+%%]
+
+%
+%%[
+if (_content.equals("%"))
+    return new Word(OperatorEnum.Mod, _content);
+%%]
+
+<
+%%[
+if (_content.equals("<"))
+    return new Word(OperatorEnum.Less, _content);
+%%]
+
+<=
+%%[
+if (_content.equals("<="))
+    return new Word(OperatorEnum.LessEqual, _content);
+%%]
+
+<<
+%%[
+if (_content.equals("<<"))
+    return new Word(OperatorEnum.LeftBitShift, _content);
+%%]
+
+>
+%%[
+if (_content.equals(">"))
+    return new Word(OperatorEnum.Greater, _content);
+%%]
+
+>=
+%%[
+if (_content.equals(">="))
+    return new Word(OperatorEnum.GreaterEqual, _content);
+%%]
+
+>>
+%%[
+if (_content.equals(">>"))
+    return new Word(OperatorEnum.RightBitShift, _content);
+%%]
+
+->
+%%[
+if (_content.equals("->"))
+    return new Word(OperatorEnum.MemberAccess, _content);
+%%]
+
++=
+%%[
+if (_content.equals("+="))
+    return new Word(OperatorEnum.PlusEqual, _content);
+%%]
+
+!=
+%%[
+if (_content.equals("!="))
+    return new Word(OperatorEnum.Unequal, _content);
+%%]
+
+!
+%%[
+if (_content.equals("!"))
+    return new Word(OperatorEnum.Reverse, _content);
+%%]
+
+&
+%%[
+if (_content.equals("&"))
+    return new Word(OperatorEnum.BitAnd, _content);
+%%]
+
+&&
+%%[
+if (_content.equals("&&"))
+    return new Word(OperatorEnum.And, _content);
+%%]
+
+\|
+%%[
+if (_content.equals("|"))
+    return new Word(OperatorEnum.BitOr, _content);
+%%]
+
+\|\|
+%%[
+if (_content.equals("||"))
+    return new Word(OperatorEnum.Or, _content);
+%%]
+
+,
+%%[
+if (_content.equals(","))
+    return new Word(OperatorEnum.Comma, _content);
+%%]
+
+:
+%%[
+if (_content.equals(":"))
+    return new Word(OperatorEnum.Colon, _content);
+%%]
+
+\[
+%%[
+if (_content.equals("["))
+    return new Word(OperatorEnum.LSquareBracket, _content);
+%%]
+
+]
+%%[
+if (_content.equals("]"))
+    return new Word(OperatorEnum.RSquareBracket, _content);
+%%]
+
+{
+%%[
+if (_content.equals("{"))
+    return new Word(OperatorEnum.LCurlyBracket, _content);
+%%]
+
+}
+%%[
+if (_content.equals("}"))
+    return new Word(OperatorEnum.RCurlyBracket, _content);
+%%]
+
+\(
+%%[
+if (_content.equals("("))
+    return new Word(OperatorEnum.LBracket, _content);
+%%]
+
+\)
+%%[
+if (_content.equals(")"))
+    return new Word(OperatorEnum.RBracket, _content);
+%%]
+
+# Char
+'[\w\s]|"|_|.|\||!|?|<|>|,|\'|;|:|+|=|-|*|^|%|#|@|\(|\)|{|}|\[|]|\\'
+%%[
+if (_content.startsWith("\'"))
+    return new Word(TypeEnum.Char, _content);
+%%]
+
+# String
+"([\w\s]|_|.|\||!|?|<|>|,|\'|;|:|+|=|-|*|^|%|#|@|\(|\)|{|}|\[|]|\\)*"
+%%[
+if (_content.startsWith("\\\\""))
+    return new Word(TypeEnum.String, _content);
+%%]
+
+//([\w]| |\t|_|.|\||!|?|<|>|,|"|\'|;|:|+|=|-|*|^|%|#|@|\(|\)|{|}|\[|])*(\r|\n)(\r|\n)*
+%%[
+return new Word(OperatorEnum.Comment, _content);
+%%]
+
+/\*([\w\s]|_|.|\||!|?|<|>|,|"|\'|;|:|+|=|-|*|^|%|#|@|\(|\)|{|}|\[|])*\*/
+%%[
+return new Word(OperatorEnum.Comment, _content);
+%%]
